@@ -1,6 +1,6 @@
 import prisma from '../db/prisma';
-import { calculateSM2, DEFAULT_SM2_STATE } from './sm2';
-import { computeScore } from './scoring';
+import { calculateSM2, DEFAULT_SM2_STATE } from '../learning/sm2';
+import { computeScore } from '../learning/scoring';
 import type { ReviewDTO } from '../schemas/studySchema';
 
 const NEW_CARDS_PER_SESSION = 10;
@@ -175,8 +175,6 @@ class StudyService {
   }
 
   async getHeatmap(userId: string) {
-    // Фільтруємо через Prisma (надійно на будь-якій ОС),
-    // групуємо по даті в JS (уникаємо SQLite date quirks на Windows)
     const since = new Date();
     since.setFullYear(since.getFullYear() - 1);
 
@@ -198,7 +196,6 @@ class StudyService {
   }
 
   async getForecast(userId: string) {
-    // Prisma + JS grouping — уникаємо SQLite BETWEEN quirks (аналогічно getHeatmap)
     const now = new Date();
     now.setHours(0, 0, 0, 0);
     const in30Days = new Date(now);

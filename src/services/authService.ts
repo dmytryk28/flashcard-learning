@@ -84,7 +84,6 @@ class AuthService {
       throw { status: 401, message: 'Refresh token revoked or expired' };
     }
 
-    // Rotate — delete old, issue new pair
     await prisma.refreshToken.delete({ where: { token } });
 
     const accessToken = generateAccessToken({ id: payload.id, email: payload.email });

@@ -5,7 +5,7 @@ import { authenticate } from '../middleware/auth';
 import { createDeckSchema, updateDeckSchema } from '../schemas/deckSchema';
 import * as DeckController from '../controllers/deckController';
 import * as CardController from '../controllers/cardController';
-import { createCardSchema, updateCardSchema } from '../schemas/cardSchema';
+import { createCardSchema } from '../schemas/cardSchema';
 
 const router = Router();
 const jsonParser = express.json();
