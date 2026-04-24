@@ -10,11 +10,10 @@ class DeckService {
     });
   }
 
-  findPublic(userId: string, search?: string) {
+  findPublic(search: string) {
     return prisma.deck.findMany({
       where: {
         isPublic: true,
-        userId: { not: userId },
         ...(search && {
           OR: [
             { title: { contains: search } },

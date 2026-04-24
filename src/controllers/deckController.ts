@@ -13,8 +13,8 @@ export async function getMyDecks(req: Request, res: Response) {
 
 export async function getPublicDecks(req: Request, res: Response) {
   try {
-    const search = req.query.search as string | undefined;
-    const decks = await deckService.findPublic(req.user!.id, search);
+    const search = req.query.search as string;
+    const decks = await deckService.findPublic(search);
     res.status(200).json(decks);
   } catch (err: any) {
     res.status(err.status ?? 500).json({ error: err.message ?? 'Internal server error' });
