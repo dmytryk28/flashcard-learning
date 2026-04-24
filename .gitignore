@@ -1,0 +1,8 @@
+.idea/
+node_modules/
+prisma/migrations/
+.env
+*.db
+*.db-journal
+*.db-wal
+*.db-shm

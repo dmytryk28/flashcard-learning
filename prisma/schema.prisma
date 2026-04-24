@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  decks         Deck[]
+  reviews       CardReview[]
+  progress      CardProgress[]
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Deck {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  isPublic    Boolean  @default(false)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  cards Card[]
+}
+
+model Card {
+  id        String   @id @default(cuid())
+  front     String
+  back      String
+  hint      String?
+  deckId    String
+  deck      Deck     @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tags     CardTag[]
+  reviews  CardReview[]
+  progress CardProgress[]
+}
+
+model CardTag {
+  id     String @id @default(cuid())
+  tag    String
+  cardId String
+  card   Card   @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@unique([cardId, tag])
+}
+
+// Current SM-2 state per card per user
+model CardProgress {
+  id           String   @id @default(cuid())
+  cardId       String
+  userId       String
+  easeFactor   Float    @default(2.5)
+  interval     Int      @default(0)
+  repetitions  Int      @default(0)
+  nextReviewAt DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([cardId, userId])
+}
+
+// Historical log of every review attempt
+model CardReview {
+  id           String   @id @default(cuid())
+  cardId       String
+  userId       String
+  quality      Int
+  exerciseType String
+  userAnswer   String?
+  isCorrect    Boolean
+  timeSpentMs  Int?
+  reviewedAt   DateTime @default(now())
+
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
