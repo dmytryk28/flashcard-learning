@@ -9,7 +9,6 @@ const REVIEW_CARDS_PER_SESSION = 20;
 type TagRetention = { tag: string; totalReviews: number; retentionRate: number; avgEaseFactor: number };
 type StreakRow = { streakDays: number };
 type RateRow = { rate: number };
-type ForecastRow = { date: string; count: number };
 
 class StudyService {
   async getSession(deckId: string, userId: string) {
@@ -199,17 +198,30 @@ class StudyService {
   }
 
   async getForecast(userId: string) {
-    const rows = await prisma.$queryRaw<ForecastRow[]>`
-      SELECT
-        SUBSTR(nextReviewAt, 1, 10) AS date,
-        CAST(COUNT(*) AS INTEGER)   AS count
-      FROM  CardProgress
-      WHERE userId = ${userId}
-        AND SUBSTR(nextReviewAt, 1, 10) BETWEEN DATE('now') AND DATE('now', '+30 days')
-      GROUP BY SUBSTR(nextReviewAt, 1, 10)
-      ORDER BY date ASC
-    `;
-    return rows.map((r) => ({ ...r, count: Number(r.count) }));
+    // Prisma + JS grouping — уникаємо SQLite BETWEEN quirks (аналогічно getHeatmap)
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const in30Days = new Date(now);
+    in30Days.setDate(in30Days.getDate() + 30);
+
+    const progresses = await prisma.cardProgress.findMany({
+      where: {
+        userId,
+        nextReviewAt: { gte: now, lte: in30Days },
+      },
+      select: { nextReviewAt: true },
+      orderBy: { nextReviewAt: 'asc' },
+    });
+
+    const counts = new Map<string, number>();
+    for (const p of progresses) {
+      const date = p.nextReviewAt.toISOString().slice(0, 10);
+      counts.set(date, (counts.get(date) ?? 0) + 1);
+    }
+
+    return Array.from(counts.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, count]) => ({ date, count }));
   }
 }
 

@@ -6,3 +6,4 @@ prisma/migrations/
 *.db-journal
 *.db-wal
 *.db-shm
+test.js
