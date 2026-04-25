@@ -1,6 +1,6 @@
 # Flashcard Learning API
 
-A REST API for spaced-repetition flashcard learning. Users create decks of cards, study them through typed or multiple-choice exercises, and the system schedules future reviews using the SuperMemo 2 (SM-2) algorithm. Progress, streaks, retention rates, and upcoming review forecasts are tracked per user.
+A REST API for spaced-repetition flashcard learning. Users create decks of cards, study them through typed or multiple-choice exercises, and the system schedules future reviews using the [SuperMemo 2](https://super-memory.com/english/ol/sm2.htm) (SM-2) algorithm. Progress, streaks, retention rates, and upcoming review forecasts are tracked per user.
 
 ---
 
