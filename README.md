@@ -49,11 +49,32 @@ Stores issued refresh tokens with expiry. Deleted on logout or expiry.
 
 Each review produces a quality score fed into SM-2. The score depends on the exercise type:
 
-**Typing** — the user's answer is compared to the correct answer using Levenshtein-based similarity.
+**Typing** — the user's answer is compared to the correct answer using Levenshtein-based similarity:
 
-**Choice** — the user selects one of four options.
+| Similarity | Time < 5s | Result |
+|---|---|---|
+| >= 95% | yes | quality 5 |
+| >= 95% | no | quality 4 |
+| 75-94% | any | quality 3, marked correct |
+| 40-74% | any | quality 2, marked incorrect |
+| < 40% | any | quality 1, marked incorrect |
 
-**Matching** — the user pairs items (number of attempts matters).
+**Choice** — the user selects one of four options:
+
+| Outcome | Time | Quality |
+|---|---|---|
+| Correct | < 3 seconds | 5 |
+| Correct | 3-8 seconds | 4 |
+| Correct | > 8 seconds | 3 |
+| Incorrect | any | 1 |
+
+**Matching** — the user pairs items (number of attempts matters):
+
+| Attempts | Quality |
+|---|---|
+| 1 | 5 |
+| 2 | 3 |
+| 3+ | 1 |
 
 ### SM-2 Algorithm
 
